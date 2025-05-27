@@ -3,6 +3,7 @@ import NumberInputWithCheck from "../components/NumberInputWithCheck ";
 import SelectInputWithCheck from "../components/SelectInputWithCheck";
 import TextInputWithCheck from "../components/TextInputWithCheck";
 import PhotoUploader from "../components/PhotoUploader";
+import AlertBox from "../components/AlertBox";
 
 const FormValidation = () => {
   const [formData, setFormData] = useState({
@@ -30,11 +31,12 @@ const FormValidation = () => {
   const [errors, setErrors] = useState({});
   const [image, setImage] = useState(null);
   const [photos, setPhotos] = useState([]);
-
+  const [alertOpen, setAlertOpen] = useState(false);
   const inputRef = useRef();
   const isValidPhone = (phone) => /^\d{10}$/.test(phone.trim());
   const isValidText = (text) => text.trim().length >= 10;
   const isNonEmpty = (value) => value.trim() !== "";
+  const [showAlert, setShowAlert] = useState(false);
 
   const isFormValid =
     formData.type.trim() !== "" &&
@@ -44,8 +46,8 @@ const FormValidation = () => {
     formData.description.trim().length >= 10 &&
     formData.price.trim() !== "" &&
     /^\d{10}$/.test(formData.phone.trim()) &&
-    formData.state.trim() !== "";
-  photos.length > 0;
+    formData.state.trim() !== "" &&
+    photos.length > 0;
 
   const handleChange = (field, value) => {
     if (
@@ -175,13 +177,6 @@ const FormValidation = () => {
     }
   };
 
-  // const handleImageChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     setImage(URL.createObjectURL(file));
-  //   }
-  // };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -193,12 +188,51 @@ const FormValidation = () => {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (isFormValid) {
+      setShowAlert(true); // Show alert box
+      // You can also clear form or send data to backend here
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      type: "",
+      superBuiltupArea: "",
+      carpetArea: "",
+      description: "",
+      adTitle: "",
+      price: "",
+      phone: "",
+      state: "",
+      bhk: "",
+      bathrooms: "",
+      furnishing: "",
+      projectStatus: "",
+      listedBy: "",
+      carParking: "",
+      totalFloors: "",
+      maintenance: "",
+      floorNo: "",
+      facing: "",
+      projectName: "",
+    });
+    setErrors({});
+    setImage(null);
+    setPhotos([]);
+  };
+
   return (
     <>
       <h1 className="text-center text-2xl font-bold uppercase mt-[100px]">
         Post your Ad
       </h1>
-      <form className="max-w-4xl mx-auto mt-10 border border-gray-300 rounded-md shadow-sm bg-white">
+
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-4xl mx-auto mt-10 border border-gray-300 rounded-md shadow-sm bg-white"
+      >
         <div className="p-6 space-y-6">
           <h2 className="text-[20px] font-bold mb-4 uppercase">
             Selected category
@@ -535,11 +569,11 @@ const FormValidation = () => {
               Upload up to 20 photos
             </h2>
             <PhotoUploader photos={photos} onPhotosChange={setPhotos} />
-            {/* {photos.length === 0 && (
+            {photos.length === 0 && (
               <p className="text-red-600 text-sm mt-1">
                 This field is mandatory.
               </p>
-            )} */}
+            )}
           </div>
         </div>
 
@@ -721,6 +755,15 @@ const FormValidation = () => {
           </button>
         </div>
       </form>
+      {showAlert && (
+        <AlertBox
+          message="Your form has been submitted successfully!"
+          onClose={() => {
+            setShowAlert(false);
+            resetForm();
+          }}
+        />
+      )}
     </>
   );
 };
